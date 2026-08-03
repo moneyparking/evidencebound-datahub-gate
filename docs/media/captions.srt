@@ -1,0 +1,85 @@
+1
+00:00:00,000 --> 00:00:11,782
+This is the failure we want to see. A stale-schema candidate reaches
+EvidenceBound and returns BLOCKED with SCHEMA MISMATCH. The runtime
+result stays null, promotion authorization stays false, and no
+deployment or transaction claim is made.
+
+2
+00:00:12,232 --> 00:00:24,553
+EvidenceBound DataHub Gate adds a narrow boundary between metadata
+access and human approval: Read Context, Restricted AST Gate, Tamper-
+Evident Proof Pack, and Native DataHub Write-Back. Mandatory Human
+Review remains outside automation.
+
+3
+00:00:25,003 --> 00:00:37,757
+The accepted live run used the DataHub showcase order-history dataset.
+MCP discovered this exact URN, read entity and schema context, obtained
+lineage evidence, ran both candidate paths, and appended both receipts
+to the same description.
+
+4
+00:00:38,207 --> 00:00:50,085
+The read is deliberately bounded to one lineage hop and five results.
+Upstream is checked first; after a visible edge, the opposite direction
+is skipped. This avoids unbounded expansion, while missing lineage still
+blocks verification.
+
+5
+00:00:50,535 --> 00:01:04,679
+The candidate enters the deterministic gate. Dataset identity and
+observed digests bind first. The Restricted AST Policy rejects
+unsupported constructs. Supported operations run in a Fail-Closed
+Bounded Interpreter without exec, and claims require evidence
+references.
+
+6
+00:01:05,129 --> 00:01:18,766
+With current DataHub context, the candidate matches observed schema and
+lineage digests, producing VERIFIED. The verdict covers only the
+recorded candidate, context, policy, and interpreter. Promotion remains
+false and human review remains required.
+
+7
+00:01:19,216 --> 00:01:29,936
+Change only the expected schema digest. The source does not run.
+EvidenceBound returns BLOCKED with SCHEMA MISMATCH, a different Proof
+Pack root, and no runtime result. Stale contracts do not silently pass.
+
+8
+00:01:30,386 --> 00:01:44,692
+Both outcomes become Native DataHub Description Receipts through
+official update description. Each records verdict, Proof Pack root,
+digests, reasons, human review, and false promotion authorization. It is
+graph-visible metadata evidence, not a badge or production
+authorization.
+
+9
+00:01:45,142 --> 00:02:00,435
+Each result becomes a Tamper-Evident Content-Addressed Proof Pack. The
+retained VERIFIED pack reproduced with manifest b41f; the BLOCKED pack
+with 3f83. Candidate, context, receipt, MCP evidence, manifest, and
+SHA-256 sums remain inspectable.
+
+10
+00:02:00,885 --> 00:02:12,989
+Tamper evidence is executable. The public test appends one byte to gate-
+receipt JSON and reruns verification. The required result is ARTIFACT
+TAMPERING DETECTED. This is hash-based detection, not a digital-
+signature claim.
+
+11
+00:02:13,439 --> 00:02:30,560
+The implementation is public at moneyparking slash evidencebound datahub
+gate. Accepted commit c8279f is validated by Actions run 30833135318.
+Checkout, Python setup, installation, and deterministic validation all
+succeeded.
+
+12
+00:02:31,010 --> 00:02:45,604
+The architecture is deliberately narrow. DataHub MCP supplies identity,
+schema, and bounded lineage. EvidenceBound applies the Restricted AST
+Policy and Fail-Closed Bounded Interpreter, then emits the Proof Pack
+and Native Description Receipt. The final decision is Mandatory Human
+Review.
