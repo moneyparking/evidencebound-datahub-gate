@@ -1,0 +1,41 @@
+{
+  "schema_version": "evidencebound-shared-claim-map/1.0",
+  "project": "EvidenceBound DataHub Gate",
+  "claim_boundary": {
+    "allowed_after_controlled_pack": [
+      "A newly authored Apache-2.0 vertical slice produces deterministic VERIFIED and BLOCKED Proof Packs from controlled DataHub-shaped context.",
+      "The gate preserves human approval and never authorizes automatic promotion."
+    ],
+    "allowed_after_live_mcp_acceptance": [
+      "DataHub MCP read schema and lineage from a local DataHub instance.",
+      "DataHub MCP wrote the EvidenceBound receipt back to the selected dataset description.",
+      "The live evidence pack reproduced without artifact or manifest drift."
+    ],
+    "prohibited_without_external_evidence": [
+      "TRL-4 or TRL-5 achieved",
+      "certified safe",
+      "production ready",
+      "customer accepted",
+      "Microsoft funded or approved",
+      "Startup EDGE funded or approved"
+    ]
+  },
+  "application_mapping": {
+    "startup_edge": {
+      "role": "DeepTech controlled-environment validation evidence",
+      "required_artifacts": [
+        "evidence/live-datahub-smoke/demo-summary.json",
+        "evidence/live-datahub-smoke/verified/manifest.json",
+        "evidence/live-datahub-smoke/blocked/manifest.json"
+      ]
+    },
+    "microsoft_for_startups": {
+      "role": "Non-production metadata-governance and reproducibility workload for future Azure validation",
+      "required_artifacts": [
+        "evidence/live-datahub-smoke/demo-summary.json",
+        "evidence/live-datahub-smoke/verified/manifest.json",
+        "evidence/live-datahub-smoke/blocked/manifest.json"
+      ]
+    }
+  }
+}

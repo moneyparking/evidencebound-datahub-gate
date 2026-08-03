@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evidencebound-datahub-gate"
+version = "0.1.0"
+description = "Fail-closed read, verify, and write-back governance for DataHub-connected agents."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Ruslan Vrublevskyi" }]
+dependencies = []
+
+[project.optional-dependencies]
+datahub = [
+  "fastmcp>=3.2,<4",
+  "mcp-server-datahub",
+]
+dev = [
+  "pytest>=8.3,<9",
+  "ruff>=0.12,<1",
+  "mypy>=1.14,<2",
+]
+
+[project.scripts]
+evidencebound-datahub = "evidencebound_datahub.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["evidencebound_datahub"]
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["fastmcp", "fastmcp.*"]
+ignore_missing_imports = true

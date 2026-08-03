@@ -1,0 +1,16 @@
+{
+  "dataset_urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,evidencebound.orders,PROD)",
+  "schema_fields": [
+    {"fieldPath": "record_id", "nativeDataType": "varchar"},
+    {"fieldPath": "quantity", "nativeDataType": "integer"},
+    {"fieldPath": "unit_price_cents", "nativeDataType": "integer"}
+  ],
+  "lineage": {
+    "upstream": {
+      "searchResults": [
+        {"entity": {"urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,evidencebound.raw_orders,PROD)"}}
+      ]
+    },
+    "downstream": {"searchResults": []}
+  }
+}

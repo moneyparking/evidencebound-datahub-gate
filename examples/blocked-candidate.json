@@ -1,0 +1,31 @@
+{
+  "candidate_id": "metadata-bound-transform-stale-schema-v1",
+  "claims": [
+    {
+      "claim_id": "claim.schema-lineage-bound-transform",
+      "evidence_refs": [
+        "schema:quantity",
+        "schema:record_id",
+        "schema:unit_price_cents",
+        "lineage:urn:li:dataset:(urn:li:dataPlatform:postgres,evidencebound.raw_orders,PROD)"
+      ],
+      "statement": "The transform uses fields observed in the selected DataHub dataset and is bound to the observed lineage digest."
+    }
+  ],
+  "dataset_urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,evidencebound.orders,PROD)",
+  "expected_lineage_sha256": "c58390d89479821c4b3f89e7d483a28d23f6c67e44787e66ded3d49031db25d7",
+  "expected_schema_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "human_approval_required": true,
+  "required_fields": [
+    "quantity",
+    "record_id",
+    "unit_price_cents"
+  ],
+  "runtime_fixture": {
+    "quantity": "demo-1",
+    "record_id": 2,
+    "unit_price_cents": 1250
+  },
+  "schema_version": "evidencebound-datahub-candidate/1.0",
+  "source_code": "def transform(row):\n    derived_value = row[\"record_id\"] * row[\"unit_price_cents\"]\n    return {\"derived_value\": derived_value, \"record_id\": row[\"quantity\"]}\n"
+}
