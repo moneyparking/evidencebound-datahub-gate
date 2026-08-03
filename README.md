@@ -1,51 +1,71 @@
 # EvidenceBound DataHub Gate
 
-**Fail-closed read → verify → write-back governance for DataHub-connected agents.**
+![EvidenceBound DataHub Gate accepted evidence summary](docs/media/readme-hero.svg)
+
+**Fail-Closed Read → Verify → Write-Back Governance for Data Agents.**
 
 This repository is the newly authored DataHub hackathon vertical slice of the broader EvidenceBound design. It is intentionally independent of SignalReview production, private enterprise workers, customer code, billing, authentication, and proprietary sports logic.
 
+## Reproduce the complete DataHub MCP loop
+
+Prerequisites: Linux/WSL, Docker, Python 3.11+, network access for the first install, and sufficient Docker memory.
+
+```bash
+git clone https://github.com/moneyparking/evidencebound-datahub-gate.git
+cd evidencebound-datahub-gate
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+./scripts/run-local-datahub-smoke.sh
+```
+
+The first run downloads and starts DataHub containers, so completion time depends on network speed and available system resources. No fixed clean-install duration is claimed.
+
 ## The problem
 
-Agents can read metadata and still take unsafe actions when their generated code is bound to a stale schema, incomplete lineage, or unsupported claims. A successful tool call is not proof that the intended action is safe.
+Agents can read metadata and still take unsafe actions when generated code is bound to a stale schema, incomplete lineage, or unsupported claims. A successful tool call is not proof that the intended action is safe.
 
-## The vertical slice
+## What it does
+
+**Read Context → Restricted AST Gate → Tamper-Evident Proof Pack → Native DataHub Write-Back**
 
 ```text
 DataHub MCP
-  ├─ get_entities
-  ├─ list_schema_fields
-  └─ get_lineage
+  ├─ dataset identity
+  ├─ schema fields
+  └─ bounded one-hop lineage edge
           ↓
 EvidenceBound deterministic gate
   ├─ dataset identity binding
   ├─ schema + lineage digests
-  ├─ restricted AST policy
-  ├─ bounded no-exec interpreter
+  ├─ Restricted AST Policy
+  ├─ Fail-Closed Bounded Interpreter
   ├─ claim-to-evidence binding
   └─ VERIFIED / BLOCKED receipt
           ↓
-Content-addressed Proof Pack
+Tamper-Evident Content-Addressed Proof Pack
           ↓
-DataHub MCP update_description write-back
+Native DataHub Description Receipt
           ↓
-mandatory human review (never automatic promotion)
+Mandatory Human Review
 ```
 
 Two paths are mandatory:
 
-1. **VERIFIED** — current schema and lineage match the candidate contract.
-2. **BLOCKED** — a stale schema digest fails closed before runtime execution.
+1. **VERIFIED** — current schema and the bounded lineage evidence match the candidate contract.
+2. **BLOCKED** — a stale schema digest fails closed before runtime interpretation.
 
-Both outcomes are written back to the same DataHub dataset as a visible markdown receipt. The write-back is metadata, not approval to deploy or transact.
+Both outcomes are appended to the same DataHub dataset through the official native `update_description` MCP mutation. The write-back is metadata evidence, not production approval, transaction authorization, or permission to deploy.
 
-## Why description write-back instead of a custom aspect
+## Why native description write-back
 
-The hackathon criterion rewards contributing knowledge back to the graph. `update_description` is an official DataHub MCP mutation, visible in DataHub OSS, and requires no custom schema registration. A custom aspect or structured property can be added after the end-to-end path is stable; it is not required for the smallest reproducible demonstration.
+The hackathon criterion rewards contributing knowledge back to the graph. `update_description` is an official DataHub MCP mutation, visible in DataHub OSS, and requires no custom schema registration. This project does not claim a custom DataHub badge or aspect.
 
-## Quick controlled proof (no Docker)
+## Quick controlled proof without Docker
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 ./scripts/validate.sh
@@ -53,38 +73,45 @@ pip install -e '.[dev]'
 
 This generates two controlled Proof Packs under `evidence/` and reproduces both.
 
-## Live local DataHub acceptance
-
-Prerequisites: Linux/WSL, Docker with sufficient memory, Python 3.11+, and network access for the first install.
+You can also reproduce the retained packs directly:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-./scripts/run-local-datahub-smoke.sh
+evidencebound-datahub verify-pack evidence/controlled-verified
+evidencebound-datahub verify-pack evidence/controlled-blocked
 ```
 
-The script:
+## Live local DataHub acceptance
+
+The live script:
 
 1. installs DataHub and the official DataHub MCP server;
 2. runs `datahub docker quickstart`;
 3. loads the Apache-2.0 showcase ecommerce datapack;
 4. discovers a dataset through MCP;
-5. reads entity, schema, upstream lineage, and downstream lineage;
-6. runs VERIFIED and stale-schema BLOCKED candidates;
-7. writes both receipts back through MCP `update_description`;
+5. reads the dataset entity, schema, and a bounded one-hop lineage edge through DataHub MCP;
+6. runs the current-context `VERIFIED` candidate and stale-schema `BLOCKED` candidate;
+7. appends both Native DataHub Description Receipts through MCP `update_description`;
 8. reproduces each Proof Pack;
-9. prints `DATAHUB_MCP_READ_WRITE_ACCEPTANCE=PASS` only when every gate passes.
+9. prints `DATAHUB_MCP_READ_WRITE_ACCEPTANCE=PASS` only when every required gate passes.
+
+The accepted live dataset was:
+
+```text
+urn:li:dataset:(urn:li:dataPlatform:dbt,b2fd91.ORDER_ENTRY_DB.analytics.order_history,PROD)
+```
+
+The read is deliberately bounded to one hop and at most five results. The adapter checks upstream first and skips the opposite direction after a visible lineage edge is found. Missing lineage still blocks verification.
 
 ### Stop condition
 
-If the live smoke cannot prove all four states within the first build day, do not expand scope:
+If the live smoke cannot prove all four states, preserve the logs and fail closed:
 
 - MCP read: PASS
-- verified path: VERIFIED
-- stale path: BLOCKED
-- MCP write-back: PASS
+- current-context path: VERIFIED
+- stale-schema path: BLOCKED
+- MCP description write-back: PASS
 
-Preserve the logs, classify the blocker, and either repair the one integration or stop the hackathon build. A controlled fixture is not presented as live DataHub acceptance.
+A controlled fixture is never presented as live DataHub acceptance.
 
 ## Proof Pack
 
@@ -100,19 +127,32 @@ manifest.json
 SHA256SUMS
 ```
 
-`evidence_root_sha256` deterministically binds the candidate, DataHub context, receipt, and MCP read evidence; it is the root written back to DataHub. `manifest_body_sha256` additionally binds the MCP write result. Timestamps and an optional future cryptographic seal are excluded from both deterministic roots. Reproduction rejects modified artifacts, non-canonical JSON, symlinks, missing files, and unexpected files.
+`evidence_root_sha256` deterministically binds the candidate, DataHub context, receipt, and MCP read evidence. `manifest_body_sha256` additionally binds the MCP write result.
+
+Reproduction rejects modified artifacts, non-canonical JSON, symlinks, missing files, and unexpected files. The retained test mutates `gate-receipt.json` by one byte and requires `ARTIFACT_TAMPERING_DETECTED`.
+
+The Proof Pack is tamper-evident and content-addressed. This repository does not claim a digital signature.
+
+## How it was built
+
+Built with the official DataHub MCP server via FastMCP, the DataHub SDK, a restricted AST policy, a bounded no-exec interpreter, and a Python standard-library verification core. The public repository is Apache-2.0 licensed.
+
+Validation uses pytest, Ruff, Mypy, and GitHub Actions.
 
 ## Claim boundary
 
-`VERIFIED` means only that the exact candidate matched the observed DataHub context, passed the restricted AST policy, executed in the bounded deterministic interpreter, and bound every material claim to schema or lineage evidence.
+`VERIFIED` means only that the exact candidate matched the observed DataHub context, passed the Restricted AST Policy, executed in the Fail-Closed Bounded Interpreter, and bound every material claim to schema or lineage evidence.
 
-It does **not** mean production approval, data truth, regulatory certification, model accuracy, financial safety, customer acceptance, or permission to deploy. `promotion_authorized` is always `false`; human approval is always required.
+It does **not** mean production approval, production authorization, data truth, regulatory certification, model accuracy, financial safety, customer acceptance, or permission to deploy. `promotion_authorized` is always `false`; Mandatory Human Review always remains required.
+
+No LLM integration is claimed in this repository.
 
 ## Hackathon positioning
 
 - Track: **Agents That Do Real Work**
-- DataHub technologies: DataHub OSS + DataHub MCP Server
-- Judge-visible loop: read → deterministic action gate → Proof Pack → write-back
+- DataHub technologies: DataHub OSS + official DataHub MCP server
+- Judge-visible loop: Read Context → Restricted AST Gate → Tamper-Evident Proof Pack → Native DataHub Write-Back
+- Public repository and deterministic GitHub Actions gates
 - Submission disclosure: the EvidenceBound concept and earlier private/open-core work predate this hackathon; this DataHub adapter, bounded demo runtime, MCP workflow, and shared evidence pack were newly authored during the submission period.
 
 ## Grant synchronization
@@ -121,4 +161,4 @@ It does **not** mean production approval, data truth, regulatory certification, 
 
 ## License
 
-Apache License 2.0. See `LICENSE`.
+Apache License 2.0 applies to this published repository. It does not automatically relicense all transitive dependencies. See `LICENSE` and dependency licenses.
