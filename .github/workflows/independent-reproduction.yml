@@ -1,0 +1,53 @@
+name: independent-reproduction
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  clean-clone-reproduction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install project and validation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+
+      - name: Run deterministic project validation
+        run: ./scripts/validate.sh
+
+      - name: Reproduce retained VERIFIED and BLOCKED packs
+        run: |
+          evidencebound-datahub verify-pack evidence/controlled-verified
+          evidencebound-datahub verify-pack evidence/controlled-blocked
+
+      - name: Record exact-head reproduction evidence
+        run: |
+          {
+            echo '# Independent reproduction'
+            echo
+            echo "- UTC: $(date -u +%FT%TZ)"
+            echo "- Commit: $GITHUB_SHA"
+            echo '- Environment: fresh GitHub-hosted Ubuntu runner'
+            echo '- Validation: PASS'
+            echo '- Controlled VERIFIED pack: REPRODUCED'
+            echo '- Controlled BLOCKED pack: REPRODUCED'
+            echo '- Claim boundary: no production, certification, customer-acceptance or deployment-authorization claim'
+          } >> "$GITHUB_STEP_SUMMARY"
