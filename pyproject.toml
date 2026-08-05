@@ -4,13 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "evidencebound-datahub-gate"
-version = "0.1.0"
+version = "0.2.0"
 description = "Fail-closed read, verify, and write-back governance for DataHub-connected agents."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Ruslan Vrublevskyi" }]
-dependencies = []
+dependencies = [
+  "cryptography>=42,<47",
+]
 
 [project.optional-dependencies]
 datahub = [
