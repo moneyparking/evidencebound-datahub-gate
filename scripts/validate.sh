@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+bash -n scripts/run-recording-demo.sh
 python scripts/build-examples.py
 pytest -q
 python -m compileall -q src tests scripts
