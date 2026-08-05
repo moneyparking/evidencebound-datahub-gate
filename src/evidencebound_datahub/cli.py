@@ -19,6 +19,7 @@ from .core import (
 )
 from .mcp import DataHubMcp
 from .pack import ProofPackError, export_proof_pack, verify_proof_pack
+from .seal import generate_ed25519_keypair, seal_proof_pack, verify_ed25519_seal
 
 
 def _source_template(record_field: str, left_field: str, right_field: str) -> str:
@@ -167,7 +168,6 @@ async def _demo(args: argparse.Namespace) -> int:
                 dataset_urn=dataset_urn,
                 markdown=_receipt_markdown(pack.evidence_root_sha256, receipt.to_dict()),
             )
-            # Re-export once so the immutable pack records the actual write result.
             shutil.rmtree(root / name)
             pack = export_proof_pack(
                 root / name,
@@ -231,6 +231,92 @@ def _verify(args: argparse.Namespace) -> int:
             {
                 "status": "REPRODUCED",
                 "manifest_body_sha256": result.manifest_body_sha256,
+                "cryptographic_seal": (
+                    "PRESENT_REQUIRES_VERIFY_SEAL"
+                    if (Path(args.pack) / "ed25519-seal.json").is_file()
+                    else "NOT_PRESENT"
+                ),
+            },
+            indent=2,
+        )
+    )
+    return 0
+
+
+def _generate_keypair(args: argparse.Namespace) -> int:
+    fingerprint = generate_ed25519_keypair(
+        args.private_key,
+        args.public_key,
+        replace=args.replace,
+    )
+    print(
+        json.dumps(
+            {
+                "status": "KEYPAIR_CREATED",
+                "algorithm": "Ed25519",
+                "private_key": str(Path(args.private_key)),
+                "public_key": str(Path(args.public_key)),
+                "public_key_sha256": fingerprint,
+                "private_key_handling": "KEEP_SECRET_AND_OUT_OF_REPOSITORY",
+            },
+            indent=2,
+        )
+    )
+    return 0
+
+
+def _seal(args: argparse.Namespace) -> int:
+    try:
+        result = seal_proof_pack(
+            args.pack,
+            args.private_key,
+            key_id=args.key_id,
+            replace=args.replace,
+        )
+    except ProofPackError as exc:
+        print(json.dumps({"status": "INVALID", "reason": str(exc)}))
+        return 1
+    print(
+        json.dumps(
+            {
+                "status": "SEALED",
+                "algorithm": "Ed25519",
+                "pack": str(result.pack_path),
+                "key_id": result.key_id,
+                "public_key_sha256": result.public_key_sha256,
+                "signed_subject_sha256": result.signed_subject_sha256,
+                "identity_boundary": "PIN_PUBLIC_KEY_OUT_OF_BAND",
+            },
+            indent=2,
+        )
+    )
+    return 0
+
+
+def _verify_seal(args: argparse.Namespace) -> int:
+    try:
+        result = verify_ed25519_seal(
+            args.pack,
+            trusted_public_key_path=args.public_key,
+        )
+    except ProofPackError as exc:
+        print(json.dumps({"status": "INVALID", "reason": str(exc)}))
+        return 1
+    print(
+        json.dumps(
+            {
+                "status": "SIGNATURE_VALID",
+                "algorithm": "Ed25519",
+                "pack": str(result.pack_path),
+                "key_id": result.key_id,
+                "public_key_sha256": result.public_key_sha256,
+                "signed_subject_sha256": result.signed_subject_sha256,
+                "trusted_public_key_matched": result.trusted_key_matched,
+                "identity_boundary": (
+                    "PINNED_KEY_MATCHED"
+                    if result.trusted_key_matched
+                    else "EMBEDDED_KEY_ONLY_NOT_IDENTITY_TRUST"
+                ),
             },
             indent=2,
         )
@@ -256,6 +342,27 @@ def build_parser() -> argparse.ArgumentParser:
 
     verify = sub.add_parser("verify-pack", help="Reproduce and verify a Proof Pack")
     verify.add_argument("pack")
+
+    keypair = sub.add_parser(
+        "generate-keypair",
+        help="Generate an operator-controlled Ed25519 keypair outside the repository",
+    )
+    keypair.add_argument("--private-key", required=True)
+    keypair.add_argument("--public-key", required=True)
+    keypair.add_argument("--replace", action="store_true")
+
+    seal = sub.add_parser("seal-pack", help="Add a detached Ed25519 seal to a verified pack")
+    seal.add_argument("pack")
+    seal.add_argument("--private-key", required=True)
+    seal.add_argument("--key-id")
+    seal.add_argument("--replace", action="store_true")
+
+    verify_seal = sub.add_parser(
+        "verify-seal",
+        help="Verify a detached Ed25519 seal and optionally require a pinned public key",
+    )
+    verify_seal.add_argument("pack")
+    verify_seal.add_argument("--public-key")
     return parser
 
 
@@ -267,4 +374,10 @@ def main(argv: list[str] | None = None) -> int:
         return _offline(args)
     if args.command == "verify-pack":
         return _verify(args)
+    if args.command == "generate-keypair":
+        return _generate_keypair(args)
+    if args.command == "seal-pack":
+        return _seal(args)
+    if args.command == "verify-seal":
+        return _verify_seal(args)
     raise AssertionError("unreachable")
