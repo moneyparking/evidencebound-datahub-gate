@@ -94,15 +94,21 @@ A valid Ed25519 signature proves possession of the matching private key. Indepen
 Video ID: dEWJ2eGiDO8
 Short URL: https://youtu.be/dEWJ2eGiDO8
 Canonical watch URL: https://www.youtube.com/watch?v=dEWJ2eGiDO8
-Scheduled premiere: 5 August 2026, 21:00 Europe/Kyiv
-Owner-confirmed page availability: PASS
+Publication mode: standard public video; premiere removed by owner
+YouTube oEmbed endpoint: PASS (HTTP 200)
+YouTube embeddable-player endpoint: PASS (HTTP 200)
+YouTube max-resolution thumbnail endpoint: PASS (HTTP 200)
+OEmbed title: EvidenceBound DataHub Gate
+OEmbed author: RV
 Owner-confirmed 1080p selection: PASS
 ```
 
-An unauthenticated `yt-dlp` probe from a GitHub-hosted runner was blocked by YouTube's anti-bot challenge. It is retained only as evidence of that probe limitation and is not interpreted as a video failure.
+The successful publication probe ran on a GitHub-hosted runner as workflow run `31024839874`. Its retained artifact digest is `sha256:09aeef97414587143b28a4e20ad26402cf44fa5e644a211dda26b70f709afc9f`.
+
+An earlier unauthenticated `yt-dlp` metadata probe was blocked by YouTube's anti-bot challenge. The later official oEmbed, embed, and thumbnail endpoint checks passed; the earlier anti-bot result is therefore retained only as a probe limitation and not interpreted as a video failure.
 
 ## Publication gate
 
 Technical render and automated QA: PASS.
 
-The YouTube page and 1080p selection are owner-confirmed. Full playback after the scheduled premiere and verification of the embedded Devpost player remain the final external publication gates.
+Public YouTube publication and embeddability: PASS. Full start-to-finish playback in the processed YouTube stream and verification of the embedded Devpost player remain the final external publication gates.

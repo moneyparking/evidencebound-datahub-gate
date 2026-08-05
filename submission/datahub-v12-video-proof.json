@@ -72,15 +72,24 @@
   },
   "publication_gate": {
     "technical_render_and_automated_qa": "PASS",
-    "owner_playback_review": "REQUIRED",
-    "youtube_processed_playback_review": "REQUIRED_AFTER_PREMIERE",
+    "owner_playback_review": "REQUIRED_FULL_START_TO_FINISH",
+    "youtube_processed_playback_review": "PUBLIC_ENDPOINTS_PASS_FULL_PLAYBACK_REQUIRED",
     "devpost_embedded_player_review": "REQUIRED",
     "external_video_url": "https://youtu.be/dEWJ2eGiDO8",
     "youtube_video_id": "dEWJ2eGiDO8",
     "canonical_watch_url": "https://www.youtube.com/watch?v=dEWJ2eGiDO8",
-    "scheduled_premiere_at": "2026-08-05T21:00:00+03:00",
+    "scheduled_premiere_at": null,
     "youtube_page_owner_review": "PASS",
     "youtube_1080p_owner_review": "PASS",
-    "youtube_automated_metadata_probe": "BLOCKED_YOUTUBE_ANTI_BOT"
+    "youtube_automated_metadata_probe": "PASS_VIA_OEMBED_EMBED_AND_THUMBNAIL_ENDPOINTS",
+    "youtube_publication_mode": "STANDARD_PUBLIC_VIDEO_OWNER_CONFIRMED",
+    "youtube_oembed_review": "PASS_HTTP_200",
+    "youtube_embed_endpoint_review": "PASS_HTTP_200",
+    "youtube_maxres_thumbnail_review": "PASS_HTTP_200",
+    "youtube_oembed_title": "EvidenceBound DataHub Gate",
+    "youtube_oembed_author_name": "RV",
+    "youtube_publication_verification_run": 31024839874,
+    "youtube_publication_artifact_digest": "sha256:09aeef97414587143b28a4e20ad26402cf44fa5e644a211dda26b70f709afc9f",
+    "youtube_earlier_ytdlp_probe": "BLOCKED_YOUTUBE_ANTI_BOT"
   }
 }

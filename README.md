@@ -264,9 +264,9 @@ The master contains burned English narration captions; do not overlay a second s
 
 The retained controlled sealed packs are distinct from the accepted live DataHub MCP dataset and native description write-back evidence. V12 does not claim that the separate live acceptance packs were signed.
 
-YouTube V12 premiere: https://youtu.be/dEWJ2eGiDO8
+YouTube V12 video: https://youtu.be/dEWJ2eGiDO8
 
-The YouTube page and 1080p selection were owner-confirmed before the scheduled premiere; full post-premiere playback and Devpost embed acceptance remain external gates.
+The video is now available as a standard public YouTube video. Independent verification returned HTTP 200 for YouTube oEmbed, the embeddable player endpoint, and the max-resolution thumbnail. Full start-to-finish playback and Devpost embed acceptance remain external gates.
 
 Full V12 media evidence, the clean alternative, hashes, audio QA, release acceptance, and publication gates are recorded in:
 
