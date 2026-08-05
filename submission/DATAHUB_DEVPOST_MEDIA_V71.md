@@ -52,7 +52,7 @@ Primary demo video SHA-256:
 |---|---|
 | Source validation on `4209f132` | PASS — run `30975467991` |
 | Independent clean GitHub-hosted reproduction | PASS — run `30975467842` |
-| Exact advertised `make test-repro` with project env cleared | PENDING current PR CI |
+| Exact advertised `make test-repro` with project env cleared | PASS — run `30979027917`, exact head `3f6d5ebe690e15bef93428815b787e0b256ce3fb` |
 | Full decode of clean master | PASS |
 | Full decode of captioned master | PASS |
 | Simulated 960×540 readability | PASS for headings, verdicts, commands, captions and source revision |
