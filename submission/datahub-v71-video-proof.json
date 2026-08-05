@@ -56,7 +56,10 @@
     "advertised_make_target_gate": {
       "command": "make test-repro",
       "environment_policy": "env -i with only HOME, PATH, LANG and CI",
-      "status": "PENDING_CURRENT_PR_CI"
+      "status": "PASS",
+      "workflow_run_id": 30979027917,
+      "verified_head_commit": "3f6d5ebe690e15bef93428815b787e0b256ce3fb",
+      "runner": "GitHub-hosted ubuntu-latest"
     },
     "hosted_judge_journey": {
       "verified": false,
