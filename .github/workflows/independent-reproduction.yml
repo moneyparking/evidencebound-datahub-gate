@@ -25,18 +25,25 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - name: Install project and validation dependencies
+      - name: Run advertised zero-state judge command
+        shell: bash
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e '.[dev]'
+          env -i \
+            HOME="$HOME" \
+            PATH="$PATH" \
+            LANG=C.UTF-8 \
+            CI=true \
+            make test-repro
 
-      - name: Run deterministic project validation
-        run: ./scripts/validate.sh
-
-      - name: Reproduce retained VERIFIED and BLOCKED packs
+      - name: Reproduce retained VERIFIED and BLOCKED packs through Makefile
+        shell: bash
         run: |
-          evidencebound-datahub verify-pack evidence/controlled-verified
-          evidencebound-datahub verify-pack evidence/controlled-blocked
+          env -i \
+            HOME="$HOME" \
+            PATH="$PATH" \
+            LANG=C.UTF-8 \
+            CI=true \
+            make verify-packs
 
       - name: Record exact-head reproduction evidence
         run: |
@@ -46,6 +53,8 @@ jobs:
             echo "- UTC: $(date -u +%FT%TZ)"
             echo "- Commit: $GITHUB_SHA"
             echo '- Environment: fresh GitHub-hosted Ubuntu runner'
+            echo '- Advertised command: make test-repro'
+            echo '- Project environment variables: cleared with env -i'
             echo '- Validation: PASS'
             echo '- Controlled VERIFIED pack: REPRODUCED'
             echo '- Controlled BLOCKED pack: REPRODUCED'
