@@ -1,0 +1,145 @@
+name: youtube-v12-verification
+
+on:
+  push:
+    branches:
+      - ops/verify-youtube-v12
+
+permissions:
+  contents: read
+
+jobs:
+  verify-youtube:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install verifier
+        run: python -m pip install --disable-pip-version-check yt-dlp
+
+      - name: Fetch YouTube metadata
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p youtube-verification
+          url='https://youtu.be/dEWJ2eGiDO8'
+
+          set +e
+          yt-dlp \
+            --dump-single-json \
+            --skip-download \
+            --no-warnings \
+            "$url" > youtube-verification/metadata.json 2> youtube-verification/metadata.stderr
+          metadata_exit=$?
+
+          yt-dlp --list-formats --no-warnings "$url" \
+            > youtube-verification/formats.txt 2> youtube-verification/formats.stderr
+          formats_exit=$?
+
+          yt-dlp --list-subs --no-warnings "$url" \
+            > youtube-verification/subtitles.txt 2> youtube-verification/subtitles.stderr
+          subtitles_exit=$?
+
+          yt-dlp --write-thumbnail --skip-download --no-warnings \
+            -o 'youtube-verification/thumbnail.%(ext)s' "$url" \
+            > youtube-verification/thumbnail.stdout 2> youtube-verification/thumbnail.stderr
+          thumbnail_exit=$?
+          set -e
+
+          METADATA_EXIT="$metadata_exit" \
+          FORMATS_EXIT="$formats_exit" \
+          SUBTITLES_EXIT="$subtitles_exit" \
+          THUMBNAIL_EXIT="$thumbnail_exit" \
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path('youtube-verification')
+          metadata_path = root / 'metadata.json'
+          metadata = {}
+          parse_error = None
+          if metadata_path.exists() and metadata_path.stat().st_size:
+              try:
+                  metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
+              except Exception as exc:
+                  parse_error = f'{type(exc).__name__}: {exc}'
+
+          formats = metadata.get('formats') or []
+          heights = [f.get('height') for f in formats if isinstance(f.get('height'), int)]
+          widths = [f.get('width') for f in formats if isinstance(f.get('width'), int)]
+          fps_values = [f.get('fps') for f in formats if isinstance(f.get('fps'), (int, float))]
+          duration = metadata.get('duration')
+          subtitles = metadata.get('subtitles') or {}
+          automatic_captions = metadata.get('automatic_captions') or {}
+
+          checks = {
+              'metadata_fetch_pass': os.environ['METADATA_EXIT'] == '0' and bool(metadata),
+              'video_id_match': metadata.get('id') == 'dEWJ2eGiDO8',
+              'duration_matches_v12': isinstance(duration, (int, float)) and abs(duration - 169.813) <= 1.5,
+              'hd_1080_available': any(h >= 1080 for h in heights),
+              'thirty_fps_available': any(abs(float(fps) - 30.0) <= 0.1 for fps in fps_values),
+              'not_live': metadata.get('is_live') is not True and metadata.get('live_status') not in {'is_live', 'is_upcoming'},
+              'publicly_extractable_without_auth': metadata.get('availability') in {None, 'public', 'unlisted'},
+              'thumbnail_fetch_pass': os.environ['THUMBNAIL_EXIT'] == '0',
+          }
+
+          report = {
+              'requested_url': 'https://youtu.be/dEWJ2eGiDO8',
+              'video_id': metadata.get('id'),
+              'webpage_url': metadata.get('webpage_url'),
+              'title': metadata.get('title'),
+              'description': metadata.get('description'),
+              'channel': metadata.get('channel'),
+              'channel_id': metadata.get('channel_id'),
+              'uploader': metadata.get('uploader'),
+              'upload_date': metadata.get('upload_date'),
+              'timestamp': metadata.get('timestamp'),
+              'availability': metadata.get('availability'),
+              'duration_seconds': duration,
+              'max_width': max(widths) if widths else None,
+              'max_height': max(heights) if heights else None,
+              'max_fps': max(fps_values) if fps_values else None,
+              'subtitles_languages': sorted(subtitles),
+              'automatic_caption_languages': sorted(automatic_captions),
+              'view_count': metadata.get('view_count'),
+              'like_count': metadata.get('like_count'),
+              'metadata_exit': int(os.environ['METADATA_EXIT']),
+              'formats_exit': int(os.environ['FORMATS_EXIT']),
+              'subtitles_exit': int(os.environ['SUBTITLES_EXIT']),
+              'thumbnail_exit': int(os.environ['THUMBNAIL_EXIT']),
+              'metadata_parse_error': parse_error,
+              'checks': checks,
+              'overall_pass': all(checks.values()),
+              'caption_note': 'Burned captions cannot be proven from YouTube metadata alone; they require visual playback inspection.'
+          }
+          (root / 'verification-report.json').write_text(
+              json.dumps(report, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          print(json.dumps(report, indent=2, sort_keys=True))
+          if not checks['metadata_fetch_pass']:
+              raise SystemExit('YouTube metadata extraction failed')
+          if not all(checks[key] for key in (
+              'video_id_match',
+              'duration_matches_v12',
+              'hd_1080_available',
+              'thirty_fps_available',
+              'not_live',
+              'publicly_extractable_without_auth',
+          )):
+              raise SystemExit('YouTube acceptance checks failed')
+          PY
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-v12-verification
+          path: youtube-verification/
+          if-no-files-found: error
+          retention-days: 2
