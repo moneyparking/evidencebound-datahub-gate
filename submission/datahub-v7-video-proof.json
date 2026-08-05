@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "submission": "Build with DataHub — The Agent Hackathon",
+  "project": "EvidenceBound DataHub Gate",
+  "media_version": "V7_AUDITED",
+  "render_source_commit": "922b58103f35dc64b4e645c5c13e3210824c3fad",
+  "duration_seconds": 175.0,
+  "video_format": {
+    "width": 1920,
+    "height": 1080,
+    "frame_rate": 30,
+    "video_codec": "H.264 High",
+    "pixel_format": "yuv420p",
+    "audio_codec": "AAC-LC",
+    "audio_sample_rate_hz": 48000,
+    "audio_channels": 2
+  },
+  "assets": [
+    {
+      "role": "primary_youtube_devpost_master",
+      "filename": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7_AUDITED_CLEAN.mp4",
+      "sha256": "4355c09c713630f8157e06ffba428e0749e04effd41bbf0dc7f1d5d46749b9cb",
+      "size_bytes": 9181842,
+      "caption_policy": "Upload the standalone SRT to the same YouTube video. This master has no burned narration captions."
+    },
+    {
+      "role": "burned_caption_fallback",
+      "filename": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7_AUDITED_CAPTIONED.mp4",
+      "sha256": "c43f36d12339f050ea205b8a712e613235e084005c610f451e2f39cc0806f371",
+      "size_bytes": 9999166,
+      "caption_policy": "Do not attach or enable the standalone SRT over this master; captions are already burned into the picture."
+    },
+    {
+      "role": "standalone_english_captions",
+      "filename": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7_AUDITED.srt",
+      "sha256": "d0447de6491c5da808e9fd3caf35605a988cbffb685ab0f0c95a2d4e50087ac4",
+      "size_bytes": 2788
+    }
+  ],
+  "repository_evidence": {
+    "validation_workflow_run": {
+      "id": 30902198099,
+      "conclusion": "success",
+      "source_commit": "922b58103f35dc64b4e645c5c13e3210824c3fad"
+    },
+    "independent_reproduction_workflow_run": {
+      "id": 30902198411,
+      "conclusion": "success",
+      "runner": "GitHub-hosted ubuntu-latest",
+      "source_commit": "922b58103f35dc64b4e645c5c13e3210824c3fad"
+    },
+    "judge_pages_deployment_workflow_run": {
+      "id": 30902198082,
+      "conclusion": "failure",
+      "failed_step": "Configure GitHub Pages",
+      "hosted_judge_journey_verified": false
+    }
+  },
+  "claim_boundary": {
+    "read_only_recording_is_write_back_execution": false,
+    "native_write_back_is_separate_retained_evidence": true,
+    "promotion_authorized": false,
+    "mandatory_human_review": true,
+    "digital_signature_claim": false,
+    "immutable_storage_claim": false,
+    "production_authorization_claim": false,
+    "customer_acceptance_claim": false,
+    "hosted_judge_journey_claim": false
+  },
+  "qa_status": "CONDITIONAL_PASS",
+  "remaining_owner_checks": [
+    "Manual human playback of the FLITE narration, with special attention to AST, SHA-256, fail-closed, and promotion authorized equals false.",
+    "Upload and process the selected master on YouTube, then inspect the actual Devpost embed at normal laptop width.",
+    "Enable or replace the hosted judge journey before claiming a public hosted application."
+  ]
+}
