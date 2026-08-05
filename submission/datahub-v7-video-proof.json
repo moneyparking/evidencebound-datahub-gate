@@ -3,7 +3,7 @@
   "submission": "Build with DataHub — The Agent Hackathon",
   "project": "EvidenceBound DataHub Gate",
   "media_version": "V7_AUDITED",
-  "render_source_commit": "922b58103f35dc64b4e645c5c13e3210824c3fad",
+  "render_source_commit": "4209f1326ae8805fd069b0240d27b2521ada792c",
   "duration_seconds": 175.0,
   "video_format": {
     "width": 1920,
@@ -13,47 +13,50 @@
     "pixel_format": "yuv420p",
     "audio_codec": "AAC-LC",
     "audio_sample_rate_hz": 48000,
-    "audio_channels": 2
+    "audio_channels": 2,
+    "integrated_loudness_lufs": -14.0,
+    "true_peak_dbfs": -1.5
   },
   "assets": [
     {
       "role": "primary_youtube_devpost_master",
       "filename": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7_AUDITED_CLEAN.mp4",
-      "sha256": "4355c09c713630f8157e06ffba428e0749e04effd41bbf0dc7f1d5d46749b9cb",
-      "size_bytes": 9181842,
+      "sha256": "47acd1b1152e36a66482735038767e0d3b844da9fea7f76d8d317303b70b6352",
+      "size_bytes": 9178898,
       "caption_policy": "Upload the standalone SRT to the same YouTube video. This master has no burned narration captions."
     },
     {
       "role": "burned_caption_fallback",
       "filename": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7_AUDITED_CAPTIONED.mp4",
-      "sha256": "c43f36d12339f050ea205b8a712e613235e084005c610f451e2f39cc0806f371",
-      "size_bytes": 9999166,
+      "sha256": "a1a4b00b2b8c8140e4dc10f0cc490e712d084d76cfe9e2918a375334914c13d4",
+      "size_bytes": 9996588,
       "caption_policy": "Do not attach or enable the standalone SRT over this master; captions are already burned into the picture."
     },
     {
       "role": "standalone_english_captions",
       "filename": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7_AUDITED.srt",
-      "sha256": "d0447de6491c5da808e9fd3caf35605a988cbffb685ab0f0c95a2d4e50087ac4",
+      "sha256": "aa52bfa9da4895072bf11b0358baac9f9eee8e42edaf8bd5bb3f3d92cc65208c",
       "size_bytes": 2788
     }
   ],
   "repository_evidence": {
     "validation_workflow_run": {
-      "id": 30902198099,
+      "id": 30975467991,
       "conclusion": "success",
-      "source_commit": "922b58103f35dc64b4e645c5c13e3210824c3fad"
+      "source_commit": "4209f1326ae8805fd069b0240d27b2521ada792c"
     },
     "independent_reproduction_workflow_run": {
-      "id": 30902198411,
+      "id": 30975467842,
       "conclusion": "success",
       "runner": "GitHub-hosted ubuntu-latest",
-      "source_commit": "922b58103f35dc64b4e645c5c13e3210824c3fad"
+      "source_commit": "4209f1326ae8805fd069b0240d27b2521ada792c"
     },
-    "judge_pages_deployment_workflow_run": {
-      "id": 30902198082,
-      "conclusion": "failure",
+    "judge_pages_deployment": {
+      "hosted_judge_journey_verified": false,
+      "latest_attempted_run_id": 30902198082,
+      "latest_attempted_conclusion": "failure",
       "failed_step": "Configure GitHub Pages",
-      "hosted_judge_journey_verified": false
+      "note": "The static explorer exists in the repository, but a public hosted deployment is not claimed."
     }
   },
   "claim_boundary": {
