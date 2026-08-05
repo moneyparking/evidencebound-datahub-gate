@@ -329,4 +329,8 @@ Captions: burned English narration captions present
 Release source commit: 9f39bcf2498a05a47dd7b0a82049e95893770642
 ```
 
-The external YouTube/Vimeo URL is publication-owned and must be added after the final V12 upload and processed-playback review. No external video URL is claimed in the repository before that gate is complete.
+Devpost video demo URL:
+
+https://youtu.be/dEWJ2eGiDO8
+
+The YouTube page and 1080p selection were owner-confirmed before the scheduled premiere. Full post-premiere playback and the Devpost embedded-player review remain external acceptance gates.

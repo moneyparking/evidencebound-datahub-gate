@@ -73,8 +73,14 @@
   "publication_gate": {
     "technical_render_and_automated_qa": "PASS",
     "owner_playback_review": "REQUIRED",
-    "youtube_processed_playback_review": "REQUIRED",
+    "youtube_processed_playback_review": "REQUIRED_AFTER_PREMIERE",
     "devpost_embedded_player_review": "REQUIRED",
-    "external_video_url": null
+    "external_video_url": "https://youtu.be/dEWJ2eGiDO8",
+    "youtube_video_id": "dEWJ2eGiDO8",
+    "canonical_watch_url": "https://www.youtube.com/watch?v=dEWJ2eGiDO8",
+    "scheduled_premiere_at": "2026-08-05T21:00:00+03:00",
+    "youtube_page_owner_review": "PASS",
+    "youtube_1080p_owner_review": "PASS",
+    "youtube_automated_metadata_probe": "BLOCKED_YOUTUBE_ANTI_BOT"
   }
 }

@@ -88,8 +88,21 @@ V12 does not claim:
 
 A valid Ed25519 signature proves possession of the matching private key. Independent signer identity requires comparison of the published fingerprint through a separately trusted channel.
 
+## YouTube publication
+
+```text
+Video ID: dEWJ2eGiDO8
+Short URL: https://youtu.be/dEWJ2eGiDO8
+Canonical watch URL: https://www.youtube.com/watch?v=dEWJ2eGiDO8
+Scheduled premiere: 5 August 2026, 21:00 Europe/Kyiv
+Owner-confirmed page availability: PASS
+Owner-confirmed 1080p selection: PASS
+```
+
+An unauthenticated `yt-dlp` probe from a GitHub-hosted runner was blocked by YouTube's anti-bot challenge. It is retained only as evidence of that probe limitation and is not interpreted as a video failure.
+
 ## Publication gate
 
 Technical render and automated QA: PASS.
 
-Owner playback review on the actual upload device, completed YouTube processing, and verification of the embedded Devpost player remain the final external publication gates.
+The YouTube page and 1080p selection are owner-confirmed. Full playback after the scheduled premiere and verification of the embedded Devpost player remain the final external publication gates.
