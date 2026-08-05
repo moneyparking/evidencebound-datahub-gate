@@ -25,12 +25,33 @@ VERIFIED
 BLOCKED: SCHEMA_MISMATCH
 REPRODUCED
 ARTIFACT_TAMPERING_DETECTED  # required by the retained mutation test
+SIGNATURE_VALID              # retained Ed25519-sealed packs
 ```
 
 To reproduce only the retained packs after installation:
 
 ```bash
 make verify-packs
+```
+
+To verify the retained detached Ed25519 seals against the repository-published public key:
+
+```bash
+evidencebound-datahub verify-seal \
+  evidence/controlled-verified \
+  --public-key docs/judge/keys/evidencebound-datahub-hackathon-public.pem
+
+evidencebound-datahub verify-seal \
+  evidence/controlled-blocked \
+  --public-key docs/judge/keys/evidencebound-datahub-hackathon-public.pem
+```
+
+Expected for both packs:
+
+```text
+SIGNATURE_VALID
+trusted_public_key_matched: true
+PINNED_KEY_MATCHED
 ```
 
 To run the same process from a fresh clone in a temporary directory and emit an independent report:
@@ -44,6 +65,12 @@ To inspect the static public judge journey locally:
 ```bash
 make serve-judge
 # open http://localhost:8000
+```
+
+Public Judge Explorer:
+
+```text
+https://moneyparking.github.io/evidencebound-datahub-gate/
 ```
 
 The static judge journey is an editorial proof explorer. It does not execute DataHub, represent live DataHub UI, create new acceptance evidence, or authorize deployment. No fixed clean-install duration is claimed because dependency download time varies.
@@ -177,17 +204,30 @@ mcp-read.json
 mcp-write.json
 manifest.json
 SHA256SUMS
+ed25519-seal.json  # optional contract; present in the retained controlled packs
 ```
 
 `evidence_root_sha256` deterministically binds the candidate, DataHub context, receipt, and MCP read evidence. `manifest_body_sha256` additionally binds the MCP write result.
 
 Reproduction rejects modified artifacts, non-canonical JSON, symlinks, missing files, and unexpected files. The retained test mutates `gate-receipt.json` by one byte and requires `ARTIFACT_TAMPERING_DETECTED`.
 
-The Proof Pack is tamper-evident and content-addressed. This repository does not claim a digital signature.
+The Proof Pack remains tamper-evident and content-addressed through SHA-256. When `ed25519-seal.json` is present, a separate verification step validates the detached Ed25519 signature over the verified manifest subject.
+
+### Retained Ed25519 release key
+
+The retained controlled `VERIFIED` and `BLOCKED` packs are signed with the same owner-controlled key:
+
+```text
+key_id: evidencebound-datahub-hackathon-2026
+public_key_sha256: fdf31b458136d39b3c22fe041e9ae7c986365c40275383d09e8a38ae81f0680d
+public_key: docs/judge/keys/evidencebound-datahub-hackathon-public.pem
+```
+
+The private key is not stored in the repository. A valid signature proves possession of the matching private key. The repository-published public key makes verification reproducible, but independent signer identity still requires comparison of the fingerprint through a separately trusted channel. See `docs/judge/SECURITY_AND_TRUST.md`.
 
 ## How it was built
 
-Built with the official DataHub MCP server via FastMCP, the DataHub SDK, a restricted AST policy, a bounded no-exec interpreter, and a Python standard-library verification core. The public repository is Apache-2.0 licensed.
+Built with the official DataHub MCP server via FastMCP, the DataHub SDK, a restricted AST policy, a bounded no-exec interpreter, a Python verification core, and optional detached Ed25519 attestation. The public repository is Apache-2.0 licensed.
 
 Validation uses pytest, Ruff, Mypy, and GitHub Actions.
 
