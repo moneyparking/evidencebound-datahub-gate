@@ -2,7 +2,7 @@
 
 ## Project name
 
-EvidenceBound DataHub Gate: Fail-Closed Governance for Data Agents
+EvidenceBound DataHub Gate: Fail-Closed Verification & Proof Packs for DataHub AI Agents
 
 ## Tagline
 
@@ -11,6 +11,39 @@ Fail-Closed Read → Verify → Write-Back Governance for Data Agents.
 ## Track
 
 Agents That Do Real Work
+
+## How judges can verify the evidence
+
+### Controlled reproduction
+
+```bash
+git clone https://github.com/moneyparking/evidencebound-datahub-gate.git
+cd evidencebound-datahub-gate
+make test-repro
+```
+
+This command creates a local virtual environment, installs the validation dependencies, runs the deterministic suite, regenerates the controlled current-context `VERIFIED` and stale-schema `BLOCKED` Proof Packs, and reproduces both packs.
+
+Expected states include:
+
+```text
+VERIFIED
+BLOCKED: SCHEMA_MISMATCH
+REPRODUCED
+ARTIFACT_TAMPERING_DETECTED
+```
+
+### Independent clean-clone reproduction
+
+```bash
+make independent-repro
+```
+
+This clones the public repository into a fresh temporary directory, runs the same validation path, emits a report, and prints the exact reproduced artifact hashes. No fixed completion time is claimed because dependency and network speed vary.
+
+### Public judge journey
+
+The repository includes a static public judge evidence explorer with separate current-context, stale-schema, and one-byte tamper scenarios. It is explicitly labeled as editorial: it does not represent live DataHub UI, execute DataHub, create new acceptance evidence, or authorize deployment.
 
 ## Inspiration
 
@@ -35,6 +68,17 @@ EvidenceBound DataHub Gate uses the official DataHub MCP server to discover a da
 
 Mandatory Human Review remains required. `promotion_authorized` is always `false`.
 
+## DataHub native write-back security
+
+Read-only verification and native write-back are intentionally separate evidence classes.
+
+- Read-only verification can prove MCP read, both deterministic candidate paths, and fresh Proof Pack generation without mutating DataHub metadata.
+- Native write-back runs only through the explicit live acceptance path and uses the official `update_description` MCP mutation.
+- The Native DataHub Description Receipt records the verdict, evidence roots, digests, reasons, `promotion_authorized=false`, and Mandatory Human Review.
+- A read-only recording is never represented as if it performed write-back.
+
+This is a fail-closed operating policy: metadata mutation is explicit and reviewable, while the final promotion decision remains outside automation.
+
 ## How we built it
 
 Built with the official DataHub MCP server via FastMCP, the DataHub SDK, a restricted AST policy, a bounded no-exec interpreter, and a Python standard-library verification core. The public repository is Apache-2.0 licensed.
@@ -46,14 +90,14 @@ The live adapter deliberately bounds lineage reads to one hop and at most five r
 ## Demo flow
 
 1. Cold-open on the stale-schema candidate: `BLOCKED`, `SCHEMA_MISMATCH`, no runtime result, no promotion authorization.
-2. Open the accepted DataHub dataset and show its schema plus a bounded one-hop lineage edge.
-3. Run the current-context candidate: `VERIFIED`.
-4. Change only the expected schema digest and show deterministic `BLOCKED` before runtime interpretation.
-5. Show the two Proof Pack roots.
-6. Open the same DataHub dataset and show both Native DataHub Description Receipts.
-7. Reproduce the retained VERIFIED and BLOCKED packs from the CLI.
-8. Change one byte in a pack and show `ARTIFACT_TAMPERING_DETECTED`.
-9. Show the public repository and successful GitHub Actions run.
+2. Open the public judge journey and switch between current-context, stale-schema, and one-byte tamper scenarios.
+3. Show the exact `make test-repro` path and the independent clean-clone workflow.
+4. Open the accepted DataHub dataset and show its schema plus a bounded one-hop lineage edge.
+5. Run the current-context candidate: `VERIFIED`.
+6. Change only the expected schema digest and show deterministic `BLOCKED` before runtime interpretation.
+7. Show the two Proof Pack roots and the `ARTIFACT_TAMPERING_DETECTED` mutation result.
+8. Separate the current read-only recording from the retained Native DataHub Description Receipt write-back evidence.
+9. Show the public repository and successful exact-head GitHub Actions validation.
 10. Close on the architecture: DataHub MCP → EvidenceBound Gate → Proof Pack + Description Receipt → Mandatory Human Review.
 
 ## Accomplishments that we are proud of
@@ -63,10 +107,26 @@ The live adapter deliberately bounds lineage reads to one hop and at most five r
 - bounded one-hop lineage behavior aligned across code, README, video, and Devpost;
 - native description write-back carrying evidence instead of an unsupported confidence score;
 - retained Proof Packs that reproduce and reject a one-byte mutation;
+- a one-command controlled judge path plus a fresh-clone independent reproduction workflow;
+- a public judge evidence explorer that preserves evidence-class boundaries;
 - public repository with deterministic GitHub Actions validation;
 - no automatic deployment, production authorization, or transaction authorization;
 - no custom DataHub badge or aspect claim;
 - clean separation from SignalReview production and private enterprise code.
+
+## Real-world usefulness
+
+The project targets platform, governance, and risk teams that want to use DataHub-connected agents without treating generated code or successful tool calls as self-authenticating evidence.
+
+The narrow value is a reviewable control boundary:
+
+- stale contracts fail before bounded interpretation;
+- supported candidates are bound to exact DataHub identity, schema, and lineage evidence;
+- every outcome becomes a reproducible Proof Pack;
+- evidence can be returned to the DataHub graph through a native mutation;
+- human approval remains mandatory.
+
+The design is compatible with DataOps and CI review workflows because the controlled path is command-line reproducible and returns explicit exit states. This repository does not claim completed enterprise integration, customer acceptance, certification, or production readiness.
 
 ## Challenges we overcame
 
@@ -78,11 +138,12 @@ Additional challenges included:
 - preserving deterministic evidence while timestamps and external write responses vary;
 - bounding lineage reads after a larger graph expansion exceeded the local GMS timeout;
 - separating pre-existing EvidenceBound concepts from newly authored hackathon code;
-- keeping `VERIFIED` narrowly scoped to the recorded candidate, context, policy, and interpreter.
+- keeping `VERIFIED` narrowly scoped to the recorded candidate, context, policy, and interpreter;
+- separating current read-only footage from retained write-back evidence in the judge narrative.
 
 ## What is next
 
-- independent clean-install reproduction on another machine;
+- independent reproduction by an external reviewer, using the published attestation template;
 - broader mutation and human-comprehension testing;
 - additional supported AST constructs only when they retain fail-closed semantics;
 - non-production integration evaluation with design partners.
@@ -97,8 +158,9 @@ The EvidenceBound concept and earlier private/open-core verification work predat
 
 - no transaction blocking claim;
 - no production authorization;
-- no digital-signature claim;
+- no digital-signature or cryptographic-guarantee claim;
+- no immutable-storage claim;
 - no custom DataHub badge or aspect claim;
 - no LLM integration claim;
-- no fixed 90-second clean-install promise;
-- no enterprise-ready or certification claim.
+- no fixed 60-second or 90-second clean-install promise;
+- no enterprise-ready, deployment-ready, customer-accepted, or certification claim.
