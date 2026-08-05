@@ -41,9 +41,30 @@ make independent-repro
 
 This clones the public repository into a fresh temporary directory, runs the same validation path, emits a report, and prints the exact reproduced artifact hashes. No fixed completion time is claimed because dependency and network speed vary.
 
+### Exact video source snapshot
+
+```bash
+git checkout 4209f1326ae8805fd069b0240d27b2521ada792c
+make test-repro
+```
+
+The V7.1 video is bound to this immutable release source commit. It does not claim that the release source will remain equal to mutable branch `main` after the media manifest is committed.
+
 ### Public judge journey
 
 The repository includes a static public judge evidence explorer with separate current-context, stale-schema, and one-byte tamper scenarios. It is explicitly labeled as editorial: it does not represent live DataHub UI, execute DataHub, create new acceptance evidence, or authorize deployment.
+
+## Demo video integrity
+
+Recommended Devpost/YouTube master:
+
+```text
+EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7.1_AUDITED_CAPTIONED.mp4
+SHA-256: 3b747380157051b2293a3bf1b743ac82c4b1584ec71bf37207a57311c9c3f7b2
+Release source commit: 4209f1326ae8805fd069b0240d27b2521ada792c
+```
+
+The master contains burned narration captions. Do not enable the standalone SRT over it. The clean-master alternative, SRT hash, QA evidence, and caption policy are recorded in `submission/datahub-v71-video-proof.json` and `submission/DATAHUB_DEVPOST_MEDIA_V71.md`.
 
 ## Inspiration
 
