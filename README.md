@@ -6,6 +6,48 @@
 
 This repository is the newly authored DataHub hackathon vertical slice of the broader EvidenceBound design. It is intentionally independent of SignalReview production, private enterprise workers, customer code, billing, authentication, and proprietary sports logic.
 
+## How judges can verify the evidence
+
+The fastest controlled path does not require a running DataHub instance:
+
+```bash
+git clone https://github.com/moneyparking/evidencebound-datahub-gate.git
+cd evidencebound-datahub-gate
+make test-repro
+```
+
+`make test-repro` creates a local virtual environment, installs the development dependencies, runs the deterministic validation suite, regenerates the controlled `VERIFIED` and stale-schema `BLOCKED` Proof Packs, and reproduces both packs.
+
+Expected terminal states include:
+
+```text
+VERIFIED
+BLOCKED: SCHEMA_MISMATCH
+REPRODUCED
+ARTIFACT_TAMPERING_DETECTED  # required by the retained mutation test
+```
+
+To reproduce only the retained packs after installation:
+
+```bash
+make verify-packs
+```
+
+To run the same process from a fresh clone in a temporary directory and emit an independent report:
+
+```bash
+make independent-repro
+```
+
+To inspect the static public judge journey locally:
+
+```bash
+make serve-judge
+# open http://localhost:8000
+```
+
+The static judge journey is an editorial proof explorer. It does not execute DataHub, represent live DataHub UI, create new acceptance evidence, or authorize deployment. No fixed clean-install duration is claimed because dependency download time varies.
+
 ## Reproduce the complete DataHub MCP loop
 
 Prerequisites: Linux/WSL, Docker, Python 3.11+, network access for the first install, and sufficient Docker memory.
@@ -57,6 +99,16 @@ Two paths are mandatory:
 2. **BLOCKED** — a stale schema digest fails closed before runtime interpretation.
 
 Both outcomes are appended to the same DataHub dataset through the official native `update_description` MCP mutation. The write-back is metadata evidence, not production approval, transaction authorization, or permission to deploy.
+
+## Read-only verification and governed write-back
+
+Read-only and write-back executions are intentionally distinct evidence classes.
+
+- A read-only recording can prove MCP read, the current-context `VERIFIED` path, the stale-schema `BLOCKED` path, and fresh Proof Pack generation without mutating DataHub metadata.
+- Native write-back is executed only in the explicit live acceptance path and appends evidence through the official `update_description` MCP mutation.
+- The write-back receipt records `promotion_authorized=false`; Mandatory Human Review remains outside automation.
+
+This separation is a fail-closed operating policy, not a claim that the read-only recording performed write-back.
 
 ## Why native description write-back
 
