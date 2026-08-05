@@ -333,4 +333,4 @@ Devpost video demo URL:
 
 https://youtu.be/dEWJ2eGiDO8
 
-The YouTube page and 1080p selection were owner-confirmed before the scheduled premiere. Full post-premiere playback and the Devpost embedded-player review remain external acceptance gates.
+The video is now available as a standard public YouTube video. Independent publication verification returned HTTP 200 for YouTube oEmbed, the embeddable player endpoint, and the max-resolution thumbnail. Full start-to-finish playback and the Devpost embedded-player review remain external acceptance gates.
