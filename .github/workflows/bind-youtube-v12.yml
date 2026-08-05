@@ -1,0 +1,92 @@
+name: bind-youtube-v12
+
+on:
+  push:
+    branches:
+      - docs/bind-youtube-v12
+
+permissions:
+  contents: write
+
+jobs:
+  bind-url:
+    if: ${{ !contains(github.event.head_commit.message, '[youtube-bound]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: docs/bind-youtube-v12
+          fetch-depth: 0
+
+      - name: Bind YouTube premiere URL to V12 documentation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          url = "https://youtu.be/dEWJ2eGiDO8"
+          watch_url = "https://www.youtube.com/watch?v=dEWJ2eGiDO8"
+          premiere = "2026-08-05T21:00:00+03:00"
+
+          devpost = Path("DEVPOST_SUBMISSION_V12.md")
+          text = devpost.read_text(encoding="utf-8")
+          old = (
+              "The external YouTube/Vimeo URL is publication-owned and must be added after "
+              "the final V12 upload and processed-playback review. No external video URL is "
+              "claimed in the repository before that gate is complete.\n"
+          )
+          new = (
+              "Devpost video demo URL:\n\n"
+              f"{url}\n\n"
+              "The YouTube page and 1080p selection were owner-confirmed before the scheduled "
+              "premiere. Full post-premiere playback and the Devpost embedded-player review "
+              "remain external acceptance gates.\n"
+          )
+          if old not in text:
+              raise SystemExit("DEVPOST V12 publication placeholder not found")
+          devpost.write_text(text.replace(old, new), encoding="utf-8")
+
+          proof_path = Path("submission/datahub-v12-video-proof.json")
+          proof = json.loads(proof_path.read_text(encoding="utf-8"))
+          gate = proof["publication_gate"]
+          gate["youtube_video_id"] = "dEWJ2eGiDO8"
+          gate["external_video_url"] = url
+          gate["canonical_watch_url"] = watch_url
+          gate["scheduled_premiere_at"] = premiere
+          gate["youtube_page_owner_review"] = "PASS"
+          gate["youtube_1080p_owner_review"] = "PASS"
+          gate["youtube_automated_metadata_probe"] = "BLOCKED_YOUTUBE_ANTI_BOT"
+          gate["youtube_processed_playback_review"] = "REQUIRED_AFTER_PREMIERE"
+          gate["devpost_embedded_player_review"] = "REQUIRED"
+          proof_path.write_text(json.dumps(proof, indent=2) + "\n", encoding="utf-8")
+
+          media_path = Path("submission/DATAHUB_DEVPOST_MEDIA_V12.md")
+          media = media_path.read_text(encoding="utf-8")
+          marker = "## Publication gate\n\nTechnical render and automated QA: PASS.\n\nOwner playback review on the actual upload device, completed YouTube processing, and verification of the embedded Devpost player remain the final external publication gates.\n"
+          replacement = f"""## YouTube publication\n\n```text\nVideo ID: dEWJ2eGiDO8\nShort URL: {url}\nCanonical watch URL: {watch_url}\nScheduled premiere: 5 August 2026, 21:00 Europe/Kyiv\nOwner-confirmed page availability: PASS\nOwner-confirmed 1080p selection: PASS\n```\n\nAn unauthenticated `yt-dlp` probe from a GitHub-hosted runner was blocked by YouTube's anti-bot challenge. It is retained only as evidence of that probe limitation and is not interpreted as a video failure.\n\n## Publication gate\n\nTechnical render and automated QA: PASS.\n\nThe YouTube page and 1080p selection are owner-confirmed. Full playback after the scheduled premiere and verification of the embedded Devpost player remain the final external publication gates.\n"""
+          if marker not in media:
+              raise SystemExit("V12 media publication gate marker not found")
+          media_path.write_text(media.replace(marker, replacement), encoding="utf-8")
+
+          readme_path = Path("README.md")
+          readme = readme_path.read_text(encoding="utf-8")
+          readme_marker = "Full V12 media evidence, the clean alternative, hashes, audio QA, release acceptance, and publication gates are recorded in:\n"
+          readme_insert = (
+              f"YouTube V12 premiere: {url}\n\n"
+              "The YouTube page and 1080p selection were owner-confirmed before the scheduled premiere; full post-premiere playback and Devpost embed acceptance remain external gates.\n\n"
+              + readme_marker
+          )
+          if readme_marker not in readme:
+              raise SystemExit("README V12 evidence marker not found")
+          readme_path.write_text(readme.replace(readme_marker, readme_insert, 1), encoding="utf-8")
+
+          Path(".github/workflows/bind-youtube-v12.yml").unlink()
+          PY
+
+      - name: Commit documentation binding
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add DEVPOST_SUBMISSION_V12.md README.md submission/DATAHUB_DEVPOST_MEDIA_V12.md submission/datahub-v12-video-proof.json .github/workflows/bind-youtube-v12.yml
+          git commit -m "docs: bind V12 YouTube premiere [youtube-bound]"
+          git push origin HEAD:docs/bind-youtube-v12
