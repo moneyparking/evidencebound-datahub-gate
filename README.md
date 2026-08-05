@@ -247,17 +247,34 @@ No LLM integration is claimed in this repository.
 - Public repository and deterministic GitHub Actions gates
 - Submission disclosure: the EvidenceBound concept and earlier private/open-core work predate this hackathon; this DataHub adapter, bounded demo runtime, MCP workflow, and shared evidence pack were newly authored during the submission period.
 
-## Submission media integrity — V7.1
+## Submission media integrity — V12
 
 The recommended Devpost/YouTube master is:
 
 ```text
-EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V7.1_AUDITED_CAPTIONED.mp4
-SHA-256: 3b747380157051b2293a3bf1b743ac82c4b1584ec71bf37207a57311c9c3f7b2
-Release source commit: 4209f1326ae8805fd069b0240d27b2521ada792c
+EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V12_JUDGE_CAPTIONED.mp4
+SHA-256: e51fbd9d9ddf69d87d7754be05f80f765cf05f768d63aff21c854c5815bd2a9a
+Duration: 169.813000 seconds
+Resolution: 1920×1080
+Frame rate: 30 fps
+Release source commit: 9f39bcf2498a05a47dd7b0a82049e95893770642
 ```
 
-The release source is an immutable snapshot, not a promise that it will remain equal to mutable branch `main` after the media manifest is committed. The captioned master already contains burned narration captions; do not overlay the standalone SRT. Full media evidence, alternate clean master, hashes, QA limits, and caption policy are recorded in `submission/datahub-v71-video-proof.json` and `submission/DATAHUB_DEVPOST_MEDIA_V71.md`.
+The master contains burned English narration captions; do not overlay a second subtitle track. V12 shows the redesigned Judge Explorer, detached Ed25519 verification for the retained controlled `VERIFIED` and `BLOCKED` packs, the repository-published key fingerprint, release-source identity, successful deterministic and independent-reproduction gates, successful Pages deployment, and the Mandatory Human Review boundary.
+
+The retained controlled sealed packs are distinct from the accepted live DataHub MCP dataset and native description write-back evidence. V12 does not claim that the separate live acceptance packs were signed.
+
+Full V12 media evidence, the clean alternative, hashes, audio QA, release acceptance, and publication gates are recorded in:
+
+- `submission/datahub-v12-video-proof.json`;
+- `submission/DATAHUB_DEVPOST_MEDIA_V12.md`;
+- `docs/media/VIDEO_MASTER.md`.
+
+Historical V7.1 media records remain in `submission/` as audit history and are not the recommended final submission master.
+
+## Final Devpost submission
+
+The canonical final second-page copy, Built With tags, public links, gallery order, and V12 video identity are recorded in `DEVPOST_SUBMISSION_V12.md`.
 
 ## Grant synchronization
 

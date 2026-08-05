@@ -1,0 +1,80 @@
+{
+  "schema_version": "evidencebound-datahub-video-proof-v12",
+  "recommended_master": {
+    "file_name": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V12_JUDGE_CAPTIONED.mp4",
+    "sha256": "e51fbd9d9ddf69d87d7754be05f80f765cf05f768d63aff21c854c5815bd2a9a",
+    "duration_seconds": 169.813,
+    "width": 1920,
+    "height": 1080,
+    "frame_rate_fps": 30,
+    "video_codec": "H.264",
+    "pixel_format": "yuv420p",
+    "audio_codec": "AAC",
+    "audio_sample_rate_hz": 48000,
+    "audio_channels": 2,
+    "burned_english_captions": true,
+    "full_decode": "PASS"
+  },
+  "clean_alternative": {
+    "file_name": "EvidenceBound_DataHub_Hackathon_FINAL_MASTER_V12_CLEAN.mp4",
+    "sha256": "743817a456761207c87461475498e419835694b623c2cf23a1a703bfc16c2009",
+    "duration_seconds": 169.866667,
+    "width": 1920,
+    "height": 1080,
+    "frame_rate_fps": 30,
+    "video_codec": "H.264",
+    "pixel_format": "yuv420p",
+    "audio_codec": "AAC",
+    "audio_sample_rate_hz": 48000,
+    "audio_channels": 2,
+    "full_decode": "PASS"
+  },
+  "audio_qa": {
+    "aac_stream_sha256": "b671d773648747fb49dcf7a522a4b0defe0862bdf5c9b13c0910b01f1a582251",
+    "integrated_loudness_lufs": -14.2,
+    "loudness_range_lu": 2.0,
+    "true_peak_dbfs": -1.9,
+    "additional_gain_applied": false
+  },
+  "release_binding": {
+    "repository": "moneyparking/evidencebound-datahub-gate",
+    "release_source_commit": "9f39bcf2498a05a47dd7b0a82049e95893770642",
+    "release_pull_request": 10,
+    "ed25519_key_id": "evidencebound-datahub-hackathon-2026",
+    "public_key_sha256": "fdf31b458136d39b3c22fe041e9ae7c986365c40275383d09e8a38ae81f0680d"
+  },
+  "release_acceptance": {
+    "deterministic_gates": {
+      "status": "PASS",
+      "workflow_run_number": 26
+    },
+    "independent_reproduction": {
+      "status": "PASS",
+      "workflow_run_number": 22
+    },
+    "github_pages_deployment": {
+      "status": "PASS",
+      "workflow_run_number": 4,
+      "artifact_digest": "sha256:d1459dee4762c3a2fb3ba950b1f18549aca6065b017429998a17437a4ad86636"
+    }
+  },
+  "evidence_boundaries": {
+    "retained_controlled_packs_ed25519_signed": true,
+    "separate_live_datahub_acceptance_claimed_signed": false,
+    "public_key_is_independent_identity_attestation": false,
+    "production_authorization_claimed": false,
+    "certification_claimed": false,
+    "immutable_storage_claimed": false,
+    "automatic_promotion_claimed": false,
+    "transaction_blocking_claimed": false,
+    "custom_datahub_badge_or_aspect_claimed": false,
+    "customer_acceptance_claimed": false
+  },
+  "publication_gate": {
+    "technical_render_and_automated_qa": "PASS",
+    "owner_playback_review": "REQUIRED",
+    "youtube_processed_playback_review": "REQUIRED",
+    "devpost_embedded_player_review": "REQUIRED",
+    "external_video_url": null
+  }
+}
