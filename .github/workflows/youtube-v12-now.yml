@@ -1,0 +1,86 @@
+name: youtube-v12-now
+
+on:
+  push:
+    branches:
+      - ops/verify-youtube-v12-now
+
+permissions:
+  contents: read
+
+jobs:
+  verify-publication:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify YouTube publication endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+
+          VIDEO_ID='dEWJ2eGiDO8'
+          WATCH_URL="https://www.youtube.com/watch?v=${VIDEO_ID}"
+          OEMBED_URL="https://www.youtube.com/oembed?url=${WATCH_URL}&format=json"
+          EMBED_URL="https://www.youtube-nocookie.com/embed/${VIDEO_ID}"
+          THUMB_URL="https://i.ytimg.com/vi/${VIDEO_ID}/maxresdefault.jpg"
+
+          curl --fail --silent --show-error --location \
+            --user-agent 'Mozilla/5.0 EvidenceBoundPublicationVerifier/1.0' \
+            --output evidence/oembed.json \
+            --write-out '%{http_code}\n' \
+            "$OEMBED_URL" | tee evidence/oembed-status.txt
+
+          curl --fail --silent --show-error --location \
+            --user-agent 'Mozilla/5.0 EvidenceBoundPublicationVerifier/1.0' \
+            --output evidence/embed.html \
+            --write-out '%{http_code}\n' \
+            "$EMBED_URL" | tee evidence/embed-status.txt
+
+          curl --fail --silent --show-error --location \
+            --user-agent 'Mozilla/5.0 EvidenceBoundPublicationVerifier/1.0' \
+            --output evidence/maxresdefault.jpg \
+            --write-out '%{http_code}\n' \
+            "$THUMB_URL" | tee evidence/thumbnail-status.txt
+
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+
+          data = json.loads(Path('evidence/oembed.json').read_text())
+          required = ['title', 'author_name', 'provider_name', 'thumbnail_url', 'html']
+          missing = [key for key in required if not data.get(key)]
+          if missing:
+              raise SystemExit(f'missing oEmbed fields: {missing}')
+          if data.get('provider_name') != 'YouTube':
+              raise SystemExit(f'unexpected provider: {data.get("provider_name")}')
+          if 'dEWJ2eGiDO8' not in data.get('html', ''):
+              raise SystemExit('expected video id missing from oEmbed iframe')
+
+          result = {
+              'video_id': 'dEWJ2eGiDO8',
+              'watch_url': 'https://www.youtube.com/watch?v=dEWJ2eGiDO8',
+              'short_url': 'https://youtu.be/dEWJ2eGiDO8',
+              'oembed_status': int(Path('evidence/oembed-status.txt').read_text().strip()),
+              'embed_status': int(Path('evidence/embed-status.txt').read_text().strip()),
+              'thumbnail_status': int(Path('evidence/thumbnail-status.txt').read_text().strip()),
+              'title': data['title'],
+              'author_name': data['author_name'],
+              'provider_name': data['provider_name'],
+              'thumbnail_url': data['thumbnail_url'],
+              'oembed_iframe_present': True,
+              'embed_html_sha256': hashlib.sha256(Path('evidence/embed.html').read_bytes()).hexdigest(),
+              'thumbnail_sha256': hashlib.sha256(Path('evidence/maxresdefault.jpg').read_bytes()).hexdigest(),
+              'public_page_and_embed_endpoints': 'PASS',
+              'full_media_playback_verified': False,
+              'note': 'Endpoint verification proves public oEmbed/embed/thumbnail availability. It does not independently prove full audio/video playback, duration, or every rendered frame.'
+          }
+          Path('evidence/youtube-v12-now.json').write_text(json.dumps(result, indent=2) + '\n')
+          print(json.dumps(result, indent=2))
+          PY
+
+      - name: Upload verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-v12-now
+          path: evidence/
+          retention-days: 2
