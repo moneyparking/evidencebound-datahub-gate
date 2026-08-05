@@ -19,6 +19,7 @@ PACK_FILES = (
     "mcp-read.json",
     "mcp-write.json",
 )
+OPTIONAL_PACK_FILES = ("ed25519-seal.json",)
 
 
 class ProofPackError(ValueError):
@@ -115,9 +116,10 @@ def verify_proof_pack(output_dir: str | Path) -> ProofPackResult:
     output = Path(output_dir)
     if output.is_symlink() or not output.is_dir():
         raise ProofPackError("PACK_PATH_INVALID")
-    expected = {*PACK_FILES, "manifest.json", "SHA256SUMS"}
+    required = {*PACK_FILES, "manifest.json", "SHA256SUMS"}
+    allowed = required | set(OPTIONAL_PACK_FILES)
     actual = {path.name for path in output.iterdir() if path.is_file()}
-    if actual != expected:
+    if not required.issubset(actual) or not actual.issubset(allowed):
         raise ProofPackError("PACK_FILE_SET_MISMATCH")
 
     manifest = _read_json(output / "manifest.json")
@@ -127,6 +129,13 @@ def verify_proof_pack(output_dir: str | Path) -> ProofPackResult:
     computed_root = sha256_bytes(canonical_json_bytes(manifest_body))
     if computed_root != manifest.get("manifest_body_sha256"):
         raise ProofPackError("MANIFEST_TAMPERING_DETECTED")
+
+    seal_metadata = manifest.get("optional_cryptographic_seal")
+    seal_present = "ed25519-seal.json" in actual
+    if seal_present != (seal_metadata is not None):
+        raise ProofPackError("CRYPTOGRAPHIC_SEAL_METADATA_MISMATCH")
+    if seal_metadata is not None and not isinstance(seal_metadata, dict):
+        raise ProofPackError("CRYPTOGRAPHIC_SEAL_METADATA_INVALID")
 
     recorded = manifest_body.get("artifact_sha256")
     if not isinstance(recorded, dict) or set(recorded) != set(PACK_FILES):
