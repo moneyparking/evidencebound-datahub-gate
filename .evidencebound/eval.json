@@ -2,7 +2,7 @@
   "schema_version": 1,
   "repository": "moneyparking/evidencebound-datahub-gate",
   "policy": {
-    "development": "audit",
+    "development": "required",
     "frozen": "audit"
   },
   "bootstrap": [
