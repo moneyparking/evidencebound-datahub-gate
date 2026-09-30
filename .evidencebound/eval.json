@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "repository": "moneyparking/evidencebound-datahub-gate",
+  "policy": {
+    "development": "audit",
+    "frozen": "audit"
+  },
+  "bootstrap": [
+    {
+      "id": "install-dev",
+      "command": "python -m pip install -e '.[dev]'",
+      "timeout_seconds": 900
+    }
+  ],
+  "suites": [
+    {
+      "id": "deterministic-validation",
+      "phase": "development",
+      "command": "./scripts/validate.sh",
+      "hard_gate": true,
+      "timeout_seconds": 900
+    }
+  ],
+  "freeze": {
+    "enabled": false
+  }
+}
